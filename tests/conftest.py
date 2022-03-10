@@ -16,6 +16,7 @@ load_dotenv(Path(__file__).parent / ".env")
 
 class TestingConfig(Config):
     TESTING = True
+    SCHEDULER_API_ENABLED = True
     LOGGER_LEVEL = 'CRITICAL'
 
 

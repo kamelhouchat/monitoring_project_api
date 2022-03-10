@@ -37,3 +37,9 @@ class TestModelData:
 
         assert result.id == generated_data[0]
         assert result.path == 'https://url.com'
+
+        # Test with invalid parameter
+        invalid_id = 45423
+        with pytest.raises(ValueError, match=f'{invalid_id} is not '
+                                             f'a valid id.'):
+            result = Data.get(invalid_id)

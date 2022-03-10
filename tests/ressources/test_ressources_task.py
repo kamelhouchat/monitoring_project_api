@@ -22,6 +22,8 @@ NEW_TASK = {
 
 TASK_URL = '/tasks/'
 
+SCHEDULER_API_URL = '/scheduler/'
+
 DUMMY_ID = 42
 
 TASK_DB = {
@@ -73,6 +75,20 @@ class TestViewsTasks:
         is_active = data.pop('is_active')
         expected_data = copy.deepcopy(NEW_TASK)
         assert data == NEW_TASK
+
+        # Check scheduler
+        scheduler_api_response = client.get(f'{SCHEDULER_API_URL}jobs')
+        assert scheduler_api_response.status_code == 200
+        json_response = scheduler_api_response.json
+        assert len(json_response) == 2
+        assert json_response[0]['args'] == []
+        assert json_response[0]['id'] == 'auto_check_job'
+        assert json_response[0]['name'] == 'auto_check'
+        assert json_response[1]['args'] == [task_id]
+        assert f'individual_check_job_{task_id}' in json_response[1]['id']
+        assert f'individual_check_job_{task_id}' in json_response[1]['name']
+        for scheduler_task in json_response:
+            assert scheduler_task['kwargs'] == {}
 
         # Check target data
         target_data = Data.get(target_data_id)

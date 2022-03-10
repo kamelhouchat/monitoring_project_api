@@ -43,6 +43,26 @@ class TestModelTask:
                               "last_run_time=None, is_active=True)>"
         )
 
+        # Test target_data property
+        assert item._target_data is None
+
+        _ = item.target_data
+        assert item._target_data is not None
+        assert item.target_data.id == generated_data[0]
+
+        # Test get with valid parameter
+        get_result = Task.get(item.id)
+        assert get_result.name == item.name
+        assert get_result.description == item.description
+        assert get_result.task_frequency == item.task_frequency
+        assert get_result.next_run_time == item.next_run_time
+
+        # Test get with invalid parameter
+        invalid_id = 5653
+        with pytest.raises(ValueError, match=f'{invalid_id} is not a '
+                                             f'valid id.'):
+            get_result = Task.get(invalid_id)
+
         # Get related data
         related_data = Data.get(generated_data[0])
         assert related_data.id == item.target_data.id
