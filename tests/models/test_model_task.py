@@ -61,7 +61,7 @@ class TestModelTask:
         invalid_id = 5653
         with pytest.raises(ValueError, match=f'{invalid_id} is not a '
                                              f'valid id.'):
-            get_result = Task.get(invalid_id)
+            Task.get(invalid_id)
 
         # Get related data
         related_data = Data.get(generated_data[0])

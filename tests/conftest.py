@@ -1,7 +1,6 @@
 """General conf for tests."""
 
 from pathlib import Path
-import datetime as dt
 
 import pytest
 from dotenv import load_dotenv

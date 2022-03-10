@@ -1,15 +1,13 @@
 """Data schemas"""
 
-from pathlib import Path
-
 import marshmallow as ma
-from marshmallow import ValidationError
 from marshmallow_sqlalchemy import auto_field
 
 from monitoring_project_api.extensions import AutoSchema
 from monitoring_project_api.models import Data
 
 
+# noinspection PyUnresolvedReferences
 class DataModelSchema(AutoSchema):
     class Meta:
         table = Data.__table__

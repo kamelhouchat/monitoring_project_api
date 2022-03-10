@@ -78,6 +78,7 @@ def configure_app(app):
             scheduler.start()
 
     # Restore old job
+    # noinspection PyUnresolvedReferences
     try:
         number_of_added_jobs = scheduler_manager()
         app.logger.debug(f'<Scheduler> : Restore old job '

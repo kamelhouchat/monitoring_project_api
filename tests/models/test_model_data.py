@@ -42,4 +42,4 @@ class TestModelData:
         invalid_id = 45423
         with pytest.raises(ValueError, match=f'{invalid_id} is not '
                                              f'a valid id.'):
-            result = Data.get(invalid_id)
+            Data.get(invalid_id)

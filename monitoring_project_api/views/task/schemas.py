@@ -11,6 +11,7 @@ from monitoring_project_api.models import Task
 from .data_schemas import DataModelSchema
 
 
+# noinspection PyUnresolvedReferences
 class TaskModelSchema(AutoSchema):
     class Meta:
         table = Task.__table__

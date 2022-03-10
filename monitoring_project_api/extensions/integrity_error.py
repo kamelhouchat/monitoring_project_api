@@ -17,6 +17,7 @@ class catch_integrity_error(contextlib.ContextDecorator):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        # noinspection PyUnresolvedReferences
         if exc_type and issubclass(exc_type, sqla.exc.IntegrityError):
             abort(409, message=f"IntegrityError: {exc_value.orig}")
         return False

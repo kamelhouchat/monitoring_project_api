@@ -114,7 +114,7 @@ class TestViewsTasks:
         assert ret.json['status'] == 'Unprocessable Entity'
         assert ret.json['errors']['json']['next_run_time'][0] == 'Next run ' \
                                                                  'time must ' \
-                                                                 'be greater ' \
+                                                                 'be greater '\
                                                                  'than the ' \
                                                                  'actual ' \
                                                                  'time.'
