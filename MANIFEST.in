@@ -1,1 +1,6 @@
+include LICENSE
+
 include *.rst
+include tox.ini
+
+global-exclude *.py[co]
