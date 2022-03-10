@@ -3,6 +3,8 @@
 ##
 
 config.cfg
+reset_database.sh
+monitoring_project_api/extensions/database/db.sqlite
 
 ##
 # SPECIFIC IDE'S IGNORE
