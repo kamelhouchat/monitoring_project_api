@@ -27,7 +27,13 @@ class Data(Base):
         )
 
     @classmethod
-    def get(cls, data_id):
+    def get(cls, data_id: int):
+        """
+        Class method that return a data associated with the given ID.
+        :param data_id: The task id.
+        :type data_id int
+        :return: A data associated with the given ID.
+        """
         result = db.session.get(cls, data_id)
         if result is None:
             raise ValueError(f'{data_id} is not a valid id.')

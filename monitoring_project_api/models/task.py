@@ -3,14 +3,16 @@
 import time
 
 import sqlalchemy as sqla
-import sqlalchemy.orm as sqla_orm
 
 from monitoring_project_api.extensions.database import Base
 from monitoring_project_api.extensions.database import db
+from monitoring_project_api.models import Data
 
 
 class Task(Base):
     __tablename__ = "tasks"
+
+    _target_data = None
 
     id = sqla.Column(
         sqla.Integer(),
@@ -47,10 +49,16 @@ class Task(Base):
         nullable=False
     )
 
-    target_data = sqla_orm.relationship(
-        "Data",
-        primaryjoin="Data.id == Task.target_data_id",
-    )
+    @property
+    def target_data(self) -> Data:
+        """
+        Property that allows to retrieve the target data of the current task.
+        :rtype: Data
+        :return: The target data of the current task.
+        """
+        if self._target_data is None:
+            self._target_data = Data.get(self.target_data_id)
+        return self._target_data
 
     def __repr__(self):
         return (
@@ -94,3 +102,16 @@ class Task(Base):
         if active_only:
             return stmt.filter_by(is_active=True).all()
         return stmt.all()
+
+    @classmethod
+    def get(cls, task_id: int):
+        """
+        Class method that return a task associated with the given ID.
+        :param task_id: The task id.
+        :type task_id int
+        :return: A task associated with the given ID.
+        """
+        result = db.session.get(cls, task_id)
+        if result is None:
+            raise ValueError(f'{task_id} is not a valid id.')
+        return result

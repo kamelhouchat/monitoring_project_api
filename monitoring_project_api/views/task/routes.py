@@ -1,12 +1,16 @@
 """Task resources"""
+import random
 
 from flask.views import MethodView
 
 from monitoring_project_api.extensions import Blueprint
 from monitoring_project_api.extensions.database import db
+from monitoring_project_api.extensions.scheduler import scheduler
 from monitoring_project_api.models import Data
 from monitoring_project_api.models import Task
 from .schemas import TaskModelSchema
+from ...extensions.scheduler.tasks import TriggerIndividualCheck
+from ...extensions.scheduler.tasks import individual_check
 
 bp = Blueprint(
     "Task resources", __name__, url_prefix="/tasks",
@@ -60,5 +64,13 @@ class TaskViews(MethodView):
         item = Task(**new_item)
         db.session.add(item)
         db.session.commit()
+
+        # Create a task to process the data.
+        scheduler.add_job(
+            func=individual_check,
+            trigger=TriggerIndividualCheck(task=item),
+            id=f"individual_check_job_{item.id}_{random.randint(0, 1000)}",
+            args=[item.id]
+        )
 
         return item
