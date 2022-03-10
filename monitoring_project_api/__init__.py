@@ -1,7 +1,9 @@
 """Monitoring project API Flask APP"""
+import logging
 
 import click
 import flask.cli
+import sqlalchemy
 from flask import Flask
 from flask.helpers import get_env
 
@@ -10,6 +12,7 @@ from .extensions import AutoSchema  # noqa
 from .extensions import Blueprint  # noqa
 from .extensions import SQLCursorPage  # noqa
 from .extensions import Schema  # noqa
+from .extensions.scheduler.scheduler_manager import scheduler_manager
 from .views import register_blueprints
 
 _APP_NAME = 'monitoring_project_api'
@@ -62,6 +65,25 @@ def configure_app(app):
     app.logger.debug('Initialize db ...')
     from .extensions import db_init_app
     db_init_app(app)
+
+    # initialize scheduler
+    from .extensions.scheduler import scheduler
+    from .extensions.scheduler import events  # noqa
+    app.logger.debug('Initialize scheduler ...')
+    scheduler.init_app(app)
+    logging.getLogger("apscheduler").setLevel(logging.INFO)
+    with app.app_context():
+        from .extensions.scheduler import tasks  # noqa
+        if app.config['TESTING'] is not True:
+            scheduler.start()
+
+    # Restore old job
+    try:
+        number_of_added_jobs = scheduler_manager()
+        app.logger.debug(f'<Scheduler> : Restore old job '
+                         f'{number_of_added_jobs} added jobs')
+    except sqlalchemy.exc.OperationalError:
+        pass
 
     # Initialize API
     app.logger.debug('Initialize API ...')

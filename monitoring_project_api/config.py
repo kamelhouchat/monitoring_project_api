@@ -33,7 +33,7 @@ class Config:
     OPENAPI_RAPIDOC_URL = "https://unpkg.com/rapidoc/dist/rapidoc-min.js"
 
     # Flask-APScheduler config
-    SCHEDULER_API_ENABLED = True
+    SCHEDULER_API_ENABLED = False
     AUTO_CHECK_INTERVAL = 30  # Minutes
     AUTO_CHECK_EXECUTE_AFTER = 3  # Seconds (for the first execution)
     SCHEDULER_TIMEZONE = "Europe/Paris"
@@ -66,3 +66,5 @@ class DevelopmentConfig(Config):
 
     SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_ECHO = True
+
+    SCHEDULER_API_ENABLED = True
