@@ -8,6 +8,8 @@ import pytest
 
 from monitoring_project_api.models import Data
 from monitoring_project_api.models import Task
+from monitoring_project_api.models import TaskByProperty
+from monitoring_project_api.models import TaskProperty
 
 NEW_TASK = {
     "name": "Task name",
@@ -17,6 +19,11 @@ NEW_TASK = {
                       timedelta(minutes=5)).strftime('%Y-%m-%dT%H:%M:%S'),
     "target_data": {
         "path": "http://localhost:34"
+    },
+    "properties": {
+        "black_ip_address": [
+            '192.168.0.0'
+        ]
     }
 }
 
@@ -76,6 +83,23 @@ class TestViewsTasks:
         expected_data = copy.deepcopy(NEW_TASK)
         assert data == NEW_TASK
 
+        # Check properties
+        task_properties = database.session.query(
+            TaskProperty
+        ).filter(
+            TaskProperty.name.in_(NEW_TASK['properties'].keys())
+        )
+        task_by_properties = database.session.query(TaskByProperty)
+        assert task_by_properties.count() == len(NEW_TASK['properties'])
+        for property_name, property_value in NEW_TASK['properties'].items():
+            task_property = task_properties.filter(
+                TaskProperty.name == property_name).first()
+            assert task_property.name == property_name
+            db_property = task_by_properties.filter(
+                TaskByProperty.task_property_id == task_property.id)
+            assert db_property.count()
+            assert db_property.first().value == str(property_value)
+
         # Check scheduler
         scheduler_api_response = client.get(f'{SCHEDULER_API_URL}jobs')
         assert scheduler_api_response.status_code == 200
@@ -94,6 +118,16 @@ class TestViewsTasks:
         target_data = Data.get(target_data_id)
         assert target_data is not None
         assert NEW_TASK['target_data']['path'] == target_data.path
+
+        # Post without properties
+        task_without_properties = copy.deepcopy(NEW_TASK)
+        task_without_properties.pop('properties')
+        ret = client.post(TASK_URL, json=task_without_properties)
+        assert ret.status_code == 201
+
+        ret = client.get(TASK_URL)
+        assert ret.status_code == 200
+        assert len(ret.json) == 2
 
         # Post without target data
         task_without_target_data = copy.deepcopy(NEW_TASK)
