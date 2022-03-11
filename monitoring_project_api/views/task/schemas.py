@@ -37,9 +37,15 @@ class MetaCreateSchema(ma.schema.SchemaMeta):
                         required = parameters
 
             # Get the corresponding marshmallow field
-            marshmallow_field = task_property.get_ma_type()(
-                ma.fields.Str, required=required, validate=validators
-            )
+            ma_type = task_property.get_ma_type()
+            kwargs = {
+                "required": required,
+                "validate": validators
+            }
+            if ma_type == ma.fields.List:
+                marshmallow_field = ma_type(ma.fields.Str, **kwargs)
+            else:
+                marshmallow_field = ma_type(**kwargs)
 
             # Adding the field to the schema
             namespace[task_property.name] = marshmallow_field

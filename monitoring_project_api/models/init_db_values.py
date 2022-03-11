@@ -8,6 +8,7 @@ from .task import TaskPropertyTypeEnum
 
 TASK_PROPERTIES_ID_LIST = [
     "BLACK_IP_ADDRESS_ID",
+    "AVERAGE_REQUESTS_PER_HOUR_ID"
 ]
 
 TASK_ID_BY_PROPERTIES = {
@@ -21,6 +22,12 @@ TASK_PROPERTY_DEFAULT_VALUES = [
         "name": 'black_ip_address',
         "description": "A list of black IP addresses",
         "type": TaskPropertyTypeEnum.List.name,
+    },
+    {
+        "id": TASK_ID_BY_PROPERTIES['AVERAGE_REQUESTS_PER_HOUR_ID'],
+        "name": 'average_requests_per_hour',
+        "description": "The average number of requests per hour",
+        "type": TaskPropertyTypeEnum.Int.name,
     }
 ]
 
@@ -35,6 +42,14 @@ TASK_PROPERTY_VALIDATOR = {
     # - Required keys must have a boolean as value
 
     TASK_ID_BY_PROPERTIES['BLACK_IP_ADDRESS_ID']: {
+        "Required": False
+    },
+    TASK_ID_BY_PROPERTIES['AVERAGE_REQUESTS_PER_HOUR_ID']: {
+        "Range": {
+            "min": 0,
+            "min_inclusive": False,
+            "max": 100000,
+        },
         "Required": False
     }
 }
