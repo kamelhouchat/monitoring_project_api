@@ -11,6 +11,8 @@ from monitoring_project_api.models import Task
 from .schemas import TaskModelSchema
 from ...extensions.scheduler.tasks import TriggerIndividualCheck
 from ...extensions.scheduler.tasks import individual_check
+from ...models import TaskByProperty
+from ...models import TaskProperty
 
 bp = Blueprint(
     "Task resources", __name__, url_prefix="/tasks",
@@ -53,6 +55,16 @@ class TaskViews(MethodView):
 
         Route which allows to add a new task.
         """
+        # Extract task properties
+        properties = new_item.pop('properties', {})
+
+        # Get properties IDs
+        properties_ids = db.session.query(
+            TaskProperty.id, TaskProperty.name
+        ).filter(
+            TaskProperty.name.in_(properties.keys())
+        )
+
         # Extract data
         target_data = new_item.pop('target_data')
 
@@ -65,6 +77,18 @@ class TaskViews(MethodView):
         db.session.add(item)
         db.session.commit()
 
+        # Add properties
+        for (property_name, property_value) in properties.items():
+            value = TaskByProperty(
+                task_id=item.id,
+                task_property_id=properties_ids.filter(
+                    TaskProperty.name == property_name
+                ).first()[0],
+                value=str(property_value)
+            )
+            db.session.add(value)
+            db.session.commit()
+
         # Create a task to process the data.
         scheduler.add_job(
             func=individual_check,
@@ -72,5 +96,7 @@ class TaskViews(MethodView):
             id=f"individual_check_job_{item.id}_{random.randint(0, 1000)}",
             args=[item.id]
         )
+
+        item.properties = properties
 
         return item

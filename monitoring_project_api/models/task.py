@@ -1,12 +1,23 @@
 """Task model"""
 
+import ast
 import time
+from enum import Enum
 
+import marshmallow as ma
 import sqlalchemy as sqla
+import sqlalchemy.event as sqla_event
 
 from monitoring_project_api.extensions.database import Base
 from monitoring_project_api.extensions.database import db
-from monitoring_project_api.models import Data
+from .data import Data
+
+try:
+    from .init_db_values import TASK_PROPERTY_DEFAULT_VALUES  # noqa
+except ImportError:
+    import sys
+
+    init_db_values = sys.modules[__package__ + '.init_db_values']
 
 
 class Task(Base):
@@ -115,3 +126,128 @@ class Task(Base):
         if result is None:
             raise ValueError(f'{task_id} is not a valid id.')
         return result
+
+
+class TaskPropertyTypeEnum(Enum):
+    Int = ma.fields.Integer
+    Float = ma.fields.Float
+    String = ma.fields.String
+    Boolean = ma.fields.Boolean
+    List = ma.fields.List
+
+    def to_python(self, value_in):
+        if value_in is not None:
+            if self is self.__class__.Int:
+                return int(value_in)
+            elif self is self.__class__.Float:
+                return float(value_in)
+            elif self is self.__class__.String:
+                return str(value_in)
+            elif self is self.__class__.Boolean:
+                if isinstance(value_in, str):
+                    value_in = 1 if value_in.lower() == "true" else 0
+                return bool(value_in)
+            elif self is self.__class__.List:
+                # ast protect from code injection
+                try:
+                    parsed_list = ast.literal_eval(value_in)
+                except (SyntaxError, ValueError):
+                    return value_in if isinstance(value_in, list) else None
+                if isinstance(parsed_list, list):
+                    return parsed_list
+        return None
+
+
+class TaskProperty(Base):
+    __tablename__ = "task_properties"
+
+    id = sqla.Column(
+        sqla.Integer(),
+        primary_key=True
+    )
+    name = sqla.Column(
+        sqla.String(20),
+        nullable=False
+    )
+    description = sqla.Column(
+        sqla.Text(length=500),
+        nullable=True,
+    )
+    type = sqla.Column(
+        sqla.Enum(TaskPropertyTypeEnum),
+        nullable=True
+    )
+
+    def get_ma_type(self) -> ma.fields:
+        """
+        Method used to return the marshmallow field corresponding to the
+        current value.
+        :rtype: marshmallow.fields
+        :return: The marshmallow field corresponding to the current value.
+        """
+        return self.type.value
+
+    @classmethod
+    def get_all(cls) -> list:
+        """
+        Class method which allows to retrieve all the properties.
+        :return: The list of properties.
+        :rtype: list
+        """
+        return db.session.query(cls).all()
+
+    @classmethod
+    def get_by_names(cls, names_list: list) -> list:
+        """
+        Class method that allows to select properties that have specific names
+        (passed as a parameter).
+        :rtype: list
+        :param names_list: The list of names (to filter the search).
+        :return: The result of the query.
+        """
+        return db.session.query(
+            cls
+        ).filter(
+            cls.name.in_(names_list)
+        ).all()
+
+
+class TaskByProperty(Base):
+    __tablename__ = "task_by_properties"
+
+    __table_args__ = (
+        sqla.UniqueConstraint(
+            'task_id',
+            'task_property_id'
+        ),
+        sqla.PrimaryKeyConstraint(
+            'task_id',
+            'task_property_id'
+        )
+    )
+
+    task_id = sqla.Column(
+        sqla.Integer(),
+        sqla.ForeignKey('tasks.id'),
+        nullable=False
+    )
+    task_property_id = sqla.Column(
+        sqla.Integer(),
+        sqla.ForeignKey('task_properties.id'),
+        nullable=False
+    )
+    value = sqla.Column(
+        sqla.String(100),
+        nullable=False
+    )
+
+
+# noinspection PyUnusedLocal
+@sqla_event.listens_for(TaskProperty.__table__, 'after_create')
+def _insert_initial_task_property(target, connection, **kwargs):
+    # add default task property
+    for value in init_db_values.TASK_PROPERTY_DEFAULT_VALUES:
+        connection.execute(
+            target.insert(),
+            value
+        )
