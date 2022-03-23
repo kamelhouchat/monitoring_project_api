@@ -17,7 +17,7 @@ try:
 except ImportError:
     import sys
 
-    init_db_values = sys.modules[__package__ + '.init_db_values']
+    init_db_values = sys.modules[f'{__package__}.init_db_values']
 
 
 class Task(Base):
@@ -134,6 +134,7 @@ class TaskPropertyTypeEnum(Enum):
     String = ma.fields.String
     Boolean = ma.fields.Boolean
     List = ma.fields.List
+    Dict = ma.fields.Dict
 
     def to_python(self, value_in):
         if value_in is not None:
@@ -155,6 +156,13 @@ class TaskPropertyTypeEnum(Enum):
                     return value_in if isinstance(value_in, list) else None
                 if isinstance(parsed_list, list):
                     return parsed_list
+            elif self is self.__class__.Dict:
+                try:
+                    parsed_dict = ast.literal_eval(value_in)
+                except (SyntaxError, ValueError):
+                    return value_in if isinstance(value_in, dict) else None
+                if isinstance(parsed_dict, dict):
+                    return parsed_dict
         return None
 
 

@@ -21,8 +21,12 @@ class MetaCreateSchema(ma.schema.SchemaMeta):
     def __new__(mcs, classname, bases, namespace, **kwargs):
         for task_property in namespace['_meta_kwargs']:
 
-            validators = []
-            required = True
+            # validators = []
+            # required = True
+            kwargs = {
+                "required": True,
+                "validators": []
+            }
             # Get the corresponding validators
             if task_property.id in \
                     TASK_PROPERTY_VALIDATOR:
@@ -30,18 +34,14 @@ class MetaCreateSchema(ma.schema.SchemaMeta):
                         TASK_PROPERTY_VALIDATOR[
                             task_property.id].items():
                     if validator_type == 'OneOf':
-                        validators.append(ma.validate.OneOf(parameters))
-                    elif validator_type == 'Range':
-                        validators.append(ma.validate.Range(**parameters))
-                    elif validator_type == 'Required':
-                        required = parameters
+                        kwargs["validators"].append(ma.validate.OneOf(parameters))
+                    elif validator_type == 'range':
+                        kwargs["validators"].append(ma.validate.Range(**parameters))
+                    elif validator_type in ['required', 'keys', 'values']:
+                        kwargs[validator_type] = parameters
 
             # Get the corresponding marshmallow field
             ma_type = task_property.get_ma_type()
-            kwargs = {
-                "required": required,
-                "validate": validators
-            }
             if ma_type == ma.fields.List:
                 marshmallow_field = ma_type(ma.fields.Str, **kwargs)
             else:
