@@ -1,5 +1,7 @@
 """Initial database values"""
 
+import marshmallow as ma
+
 from .task import TaskPropertyTypeEnum
 
 #######
@@ -8,7 +10,7 @@ from .task import TaskPropertyTypeEnum
 
 TASK_PROPERTIES_ID_LIST = [
     "BLACK_IP_ADDRESS_ID",
-    "AVERAGE_REQUESTS_PER_HOUR_ID"
+    "AVERAGE_REQUESTS_PER_TIME_INTERVAL_ID"
 ]
 
 TASK_ID_BY_PROPERTIES = {
@@ -24,32 +26,31 @@ TASK_PROPERTY_DEFAULT_VALUES = [
         "type": TaskPropertyTypeEnum.List.name,
     },
     {
-        "id": TASK_ID_BY_PROPERTIES['AVERAGE_REQUESTS_PER_HOUR_ID'],
-        "name": 'average_requests_per_hour',
-        "description": "The average number of requests per hour",
-        "type": TaskPropertyTypeEnum.Int.name,
+        "id": TASK_ID_BY_PROPERTIES['AVERAGE_REQUESTS_PER_TIME_INTERVAL_ID'],
+        "name": 'average_requests_per_time_interval',
+        "description": "The average number of requests per time interval",
+        "type": TaskPropertyTypeEnum.Dict.name,
     }
 ]
 
 TASK_PROPERTY_VALIDATOR = {
-    # Three types of validator are possible: OneOf, Range and Required
+    # Four types of validator are possible: OneOf, Range and Required
     # - OneOf keys must have a list as value
-    # - Range keys must have a dict with this four parameters as values:
+    # - range keys must have a dict with this four parameters as values:
     #     - min
     #     - max
     #     - min_inclusive (Boolean)
     #     - max_inclusive (Boolean)
-    # - Required keys must have a boolean as value
+    # - required keys must have a boolean as value
+    # - keys and values must have a marshmallow.fields as value (its only used
+    #   with properties of type Dict)
 
     TASK_ID_BY_PROPERTIES['BLACK_IP_ADDRESS_ID']: {
-        "Required": False
+        "required": False
     },
-    TASK_ID_BY_PROPERTIES['AVERAGE_REQUESTS_PER_HOUR_ID']: {
-        "Range": {
-            "min": 0,
-            "min_inclusive": False,
-            "max": 100000,
-        },
-        "Required": False
+    TASK_ID_BY_PROPERTIES['AVERAGE_REQUESTS_PER_TIME_INTERVAL_ID']: {
+        "required": False,
+        "keys": ma.fields.Int(),
+        "values": ma.fields.Int()
     }
 }
