@@ -20,9 +20,7 @@ from .data_schemas import DataModelSchema
 class MetaCreateSchema(ma.schema.SchemaMeta):
     def __new__(mcs, classname, bases, namespace, **kwargs):
         for task_property in namespace['_meta_kwargs']:
-
-            # validators = []
-            # required = True
+            args = []
             kwargs = {
                 "required": True,
                 "validators": []
@@ -34,19 +32,21 @@ class MetaCreateSchema(ma.schema.SchemaMeta):
                         TASK_PROPERTY_VALIDATOR[
                             task_property.id].items():
                     if validator_type == 'OneOf':
-                        kwargs["validators"].append(ma.validate.OneOf(parameters))
+                        kwargs["validators"].append(ma.validate.OneOf(
+                            parameters))
                     elif validator_type == 'range':
-                        kwargs["validators"].append(ma.validate.Range(**parameters))
+                        kwargs["validators"].append(ma.validate.Range(
+                            **parameters))
+                    elif validator_type in ['items_type']:
+                        args.append(parameters)
                     elif validator_type in ['required', 'keys', 'values']:
                         kwargs[validator_type] = parameters
 
             # Get the corresponding marshmallow field
-            ma_type = task_property.get_ma_type()
-            if ma_type == ma.fields.List:
-                marshmallow_field = ma_type(ma.fields.Str, **kwargs)
-            else:
-                marshmallow_field = ma_type(**kwargs)
-
+            marshmallow_field = task_property.get_ma_type()(
+                *args,
+                **kwargs
+            )
             # Adding the field to the schema
             namespace[task_property.name] = marshmallow_field
 
