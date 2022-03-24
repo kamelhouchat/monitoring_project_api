@@ -1,8 +1,10 @@
 """Resources initialization"""
 from . import task
+from . import task_properties
 
 MODULES = [
-    task
+    task,
+    task_properties
 ]
 
 
