@@ -5,6 +5,7 @@ buildah run $ct pip install --upgrade pip setuptools
 buildah copy $ct ../../ ~/code
 buildah run $ct pip install -r requirements.txt
 buildah run $ct \
+mkdir ~/code && \
 echo -n "FLASK_SETTINGS_FILE=">~/code/.env && \
 python -c "import os; print(os.urandom(16))">>~/code/.env && \
 echo "">>~/code/.env && \
