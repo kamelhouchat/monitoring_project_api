@@ -1,7 +1,7 @@
 ct=$(buildah from debian)
 buildah run --user root $ct apt update -y
 buildah run --user root $ct apt-get install python3.9 python3.pip python3-gunicorn -y
-buildah run $ct pip install --upgrade pip setuptools && useradd test
+buildah run --user root $ct pip install --upgrade pip setuptools && useradd test
 buildah config --user test $ct
 buildah copy $ct ../../ /home/test/code
 buildah run $ct pip install -r /home/test/code/requirements.txt
