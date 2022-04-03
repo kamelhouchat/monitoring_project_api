@@ -97,6 +97,4 @@ class TaskViews(MethodView):
             args=[item.id]
         )
 
-        item.properties = properties
-
         return item

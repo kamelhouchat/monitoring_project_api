@@ -24,6 +24,7 @@ class Task(Base):
     __tablename__ = "tasks"
 
     _target_data = None
+    _properties = None
 
     id = sqla.Column(
         sqla.Integer(),
@@ -60,17 +61,6 @@ class Task(Base):
         nullable=False
     )
 
-    @property
-    def target_data(self) -> Data:
-        """
-        Property that allows to retrieve the target data of the current task.
-        :rtype: Data
-        :return: The target data of the current task.
-        """
-        if self._target_data is None:
-            self._target_data = Data.get(self.target_data_id)
-        return self._target_data
-
     def __repr__(self):
         return (
             f"<{self.__class__.__name__}("
@@ -82,6 +72,41 @@ class Task(Base):
             f", last_run_time={self.last_run_time}"
             f", is_active={self.is_active}"
             ")>")
+
+    @property
+    def target_data(self) -> Data:
+        """
+        Property that allows to retrieve the target data of the current task.
+        :rtype: Data
+        :return: The target data of the current task.
+        """
+        if self._target_data is None:
+            self._target_data = Data.get(self.target_data_id)
+        return self._target_data
+
+    @property
+    def properties(self) -> dict:
+        """
+        Function that allows to retrieve all the properties of a task.
+        :rtype: dict
+        :return: The properties list.
+        """
+        if self._properties is None:
+            result = db.session.query(
+                TaskByProperty.value, TaskProperty.name, TaskProperty.type
+            ).join(
+                TaskProperty,
+                TaskByProperty.task_property_id == TaskProperty.id
+            ).filter(
+                TaskByProperty.task_id == self.id
+            ).all()
+
+            self._properties = {
+                property_name: property_type.to_python(property_value)
+                for property_value, property_name, property_type in result
+            }
+
+        return self._properties
 
     def remaining_time_to_execute_task(self) -> float:
         """
