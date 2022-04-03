@@ -4,6 +4,7 @@ from experta import *
 
 from .facts import NotRequiredProperty
 from .facts import ProcessingMethod
+from .helpers import get_default_ip_list
 
 
 class StatisticProcessingRules:
@@ -30,21 +31,6 @@ class StatisticProcessingRules:
         self.detector.workflow = ('ACCEPTED_URLS_METHOD', {
             'accepted_urls': self.not_required_properties['accepted_urls']
         })
-
-    @Rule(
-        AND(
-            ProcessingMethod(method='ACCEPTED_URLS_METHOD'),
-            NOT(NotRequiredProperty(property_name='accepted_urls')),
-        )
-    )
-    def define_accepted_urls_parameter(self) -> None:
-        """
-        The rule allows to define the parameter `accepted_urls` of the
-        `ACCEPTED_URLS_METHOD` processing method (If it is not specified by the
-        user).
-        """
-        self.not_required_properties['accepted_urls'] = ['/']
-        self.declare(NotRequiredProperty(property_name='accepted_urls'))
 
     ##################
     # Black IP address
@@ -78,5 +64,6 @@ class StatisticProcessingRules:
         `BLACK_IP_ADDRESS_METHOD` processing method (If it is not specified by
         the user).
         """
-        self.not_required_properties['black_ip_address'] = []
+        self.not_required_properties['black_ip_address'] = \
+            list(get_default_ip_list())
         self.declare(NotRequiredProperty(property_name='black_ip_address'))

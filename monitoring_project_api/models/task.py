@@ -270,7 +270,7 @@ class TaskByProperty(Base):
         nullable=False
     )
     value = sqla.Column(
-        sqla.String(100),
+        sqla.String(),
         nullable=False
     )
 

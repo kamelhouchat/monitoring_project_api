@@ -35,7 +35,6 @@ class SelectingMethodRules:
     @Rule(
         AND(
             NOT(ProcessingMethod(method='BLACK_IP_ADDRESS_METHOD')),
-            NotRequiredProperty(property_name='black_ip_address')
         )
     )
     def select_black_ip_address_method(self):
