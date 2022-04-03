@@ -67,7 +67,15 @@ def generate_data(database, request):
     added_data = []
     for _ in range(data_quantity):
         item = Data(
-            path=data_information.get('path', "https://dymmy_url.com")
+            # path=data_information.get('path', "https://dymmy_url.com")
+            os_host=data_information.get('os_host', "dummy_url.com"),
+            os_port=data_information.get('os_port', 12502),
+            is_using_ssl=data_information.get('is_using_ssl', True),
+            auth_user_name=data_information.get(
+                'auth_user_name', "Dummy user"),
+            auth_password=data_information.get(
+                'auth_password', "Dummy password"),
+            indice=data_information.get('indice', "Dummy indice")
         )
         database.session.add(item)
         database.session.commit()

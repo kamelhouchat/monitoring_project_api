@@ -18,7 +18,12 @@ NEW_TASK = {
     "next_run_time": (datetime.now() +
                       timedelta(minutes=5)).strftime('%Y-%m-%dT%H:%M:%S'),
     "target_data": {
-        "path": "http://localhost:34"
+        "os_host": "http://localhost:34",
+        "os_port": 12525,
+        "is_using_ssl": True,
+        "auth_user_name": "Dummy user",
+        "auth_password": "Dummy password",
+        "indice": "Dummy indice"
     },
     "properties": {
         "black_ip_address": [
@@ -117,7 +122,14 @@ class TestViewsTasks:
         # Check target data
         target_data = Data.get(target_data_id)
         assert target_data is not None
-        assert NEW_TASK['target_data']['path'] == target_data.path
+        assert NEW_TASK['target_data']['os_host'] == target_data.os_host
+        assert NEW_TASK['target_data']['os_port'] == target_data.os_port
+        assert NEW_TASK['target_data']['is_using_ssl'] == \
+               target_data.is_using_ssl
+        assert NEW_TASK['target_data']['auth_user_name'] == \
+               target_data.auth_user_name
+        assert NEW_TASK['target_data']['auth_password'] == \
+               target_data.auth_password
 
         # Post without properties
         task_without_properties = copy.deepcopy(NEW_TASK)

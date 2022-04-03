@@ -66,7 +66,9 @@ class TestModelTask:
         # Get related data
         related_data = Data.get(generated_data[0])
         assert related_data.id == item.target_data.id
-        assert related_data.path == item.target_data.path
+        assert related_data.os_host == item.target_data.os_host
+        assert related_data.os_port == item.target_data.os_port
+        assert related_data.is_using_ssl == item.target_data.is_using_ssl
 
         # Test `get_all` method
         # Add deleted Task
