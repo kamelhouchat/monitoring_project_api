@@ -35,10 +35,19 @@ def database(tmpdir):
     db.dispose()
 
 
+@pytest.fixture
+def logging_path(tmpdir):
+    """
+    Yield a logging path
+    """
+    yield tmpdir / 'nginx_monitoring_logging'
+
+
 @pytest.fixture(params=(TestingConfig,))
-def app(request, database):
+def app(request, database, logging_path):
     class TestingAppConfig(request.param):
         SQLALCHEMY_DATABASE_URI = database.url
+        LOGGING_FILE_PATH = logging_path
 
     yield create_app(TestingAppConfig)
 
