@@ -2,7 +2,16 @@
 
 import marshmallow as ma
 
+from monitoring_project_api.service.stats import STATS_PROCESSING_METHODS
 from .task import TaskPropertyTypeEnum
+
+####################
+# PROCESSING METHODS
+####################
+
+PROCESSING_METHODS = {
+    **STATS_PROCESSING_METHODS
+}
 
 #######
 # TASKS
