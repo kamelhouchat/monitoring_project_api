@@ -1,5 +1,4 @@
 """Monitoring project API Flask APP"""
-import logging
 
 import click
 import flask.cli
@@ -69,6 +68,7 @@ def configure_app(app):
     # initialize scheduler
     from .extensions.scheduler import scheduler
     from .extensions.scheduler import events  # noqa
+    import logging
     app.logger.debug('Initialize scheduler ...')
     scheduler.init_app(app)
     logging.getLogger("apscheduler").setLevel(logging.INFO)
@@ -98,3 +98,14 @@ def configure_app(app):
     # Register cli command
     app.logger.debug('Registering cli commands ...')
     app.cli.add_command(setup_db)
+
+    # Init log folder
+    from .models.init_db_values import PROCESSING_METHODS
+    from .service.logging import setup_logger
+    from pathlib import Path
+    logging_path = Path(app.config['LOGGING_FILE_PATH'])
+    if not logging_path.is_dir():
+        logging_path.mkdir(parents=True)
+    # Set up loggers
+    for method in PROCESSING_METHODS.keys():
+        setup_logger(name=method, log_file=logging_path / f'{method}.log')

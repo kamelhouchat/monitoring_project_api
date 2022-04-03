@@ -6,7 +6,7 @@ from typing import NoReturn
 from apscheduler.triggers.base import BaseTrigger
 
 from monitoring_project_api.extensions.database import db
-from monitoring_project_api.service import DummyDetector
+from monitoring_project_api.service import Detector
 from monitoring_project_api.models import Task
 from . import scheduler
 from .exceptions import JobError
@@ -60,7 +60,7 @@ def auto_check():
     for item in items:
         if item.is_to_process():
             nb_processed_item = +1
-            detector = DummyDetector(task=item)
+            detector = Detector(task=item)
             detector.launch()
 
     with scheduler.app.app_context():
@@ -81,7 +81,7 @@ def individual_check(task_id: int) -> NoReturn:
         raise JobError('Individual check error <Invalid task id>') from e
 
     if task.is_to_process():
-        detector = DummyDetector(task=task)
+        detector = Detector(task=task)
         detector.launch()
         return
 

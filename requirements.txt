@@ -7,3 +7,8 @@ pytest~=7.0.1
 python-dotenv~=0.19.2
 Flask-APScheduler==1.12.2
 APScheduler~=3.9.1
+experta~=1.9.4
+schema~=0.6.7
+opensearch-py~=1.1.0
+requests~=2.27.1
+pandas~=1.4.1
