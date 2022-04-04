@@ -45,6 +45,7 @@ FLASK_SECRET="Your Secret Key"
 
 ```dotenv
 SQLALCHEMY_DATABASE_URI="sqlite:///absolute/path/to/your/db.sqlit"
+LOGGING_FILE_PATH=...# Absolute path to the logging path
 ```
 
 ### Run the service
