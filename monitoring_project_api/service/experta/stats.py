@@ -67,3 +67,23 @@ class StatisticProcessingRules:
         self.not_required_properties['black_ip_address'] = \
             list(get_default_ip_list())
         self.declare(NotRequiredProperty(property_name='black_ip_address'))
+
+    ###########################
+    # Is http requests accepted
+    ###########################
+    @Rule(
+        AND(
+            ProcessingMethod(method='IS_HTTP_REQUESTS_ACCEPTED_METHOD'),
+            NotRequiredProperty(property_name='is_http_requests_accepted')
+        )
+    )
+    def is_http_requests_accepted_method_update_workflow(self):
+        """
+        The rule allows to update the workflow by adding the
+        `IS_HTTP_REQUESTS_ACCEPTED_METHOD` and its parameters.
+        """
+        # Update detector `workflow` dictionary
+        self.detector.workflow = ('IS_HTTP_REQUESTS_ACCEPTED_METHOD', {
+            'is_http_requests_accepted': self.not_required_properties[
+                'is_http_requests_accepted']
+        })
