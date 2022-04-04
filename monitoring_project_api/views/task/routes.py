@@ -1,5 +1,6 @@
 """Task resources"""
 import random
+from pathlib import Path
 
 from flask.views import MethodView
 
@@ -13,6 +14,9 @@ from ...extensions.scheduler.tasks import TriggerIndividualCheck
 from ...extensions.scheduler.tasks import individual_check
 from ...models import TaskByProperty
 from ...models import TaskProperty
+from ...models.init_db_values import PROCESSING_METHODS
+from ...service.logging import setup_logger
+from flask import current_app
 
 bp = Blueprint(
     "Task resources", __name__, url_prefix="/tasks",
@@ -96,5 +100,18 @@ class TaskViews(MethodView):
             id=f"individual_check_job_{item.id}_{random.randint(0, 1000)}",
             args=[item.id]
         )
+
+        # Configure logger
+        # Create logging folder
+        logging_path = Path(
+            current_app.config['LOGGING_FILE_PATH']) / f'{item.name} {item.id}'
+        if not logging_path.is_dir():
+            logging_path.mkdir(parents=True)
+
+        for method in PROCESSING_METHODS.keys():
+            setup_logger(
+                name=f'{item.id}_{method}',
+                log_file=logging_path / f'{method}.log'
+            )
 
         return item

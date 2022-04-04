@@ -77,10 +77,18 @@ def configure_app(app):
         if app.config['TESTING'] is not True:
             scheduler.start()
 
+    # Init log folder
+    from pathlib import Path
+    logging_path = Path(app.config['LOGGING_FILE_PATH'])
+    if not logging_path.is_dir():
+        logging_path.mkdir(parents=True)
+
     # Restore old job
     # noinspection PyUnresolvedReferences
+    from .models.init_db_values import PROCESSING_METHODS
     try:
-        number_of_added_jobs = scheduler_manager()
+        number_of_added_jobs = scheduler_manager(PROCESSING_METHODS.keys(),
+                                                 logging_path=logging_path)
         app.logger.debug(f'<Scheduler> : Restore old job '
                          f'{number_of_added_jobs} added jobs')
     except sqlalchemy.exc.OperationalError:
@@ -98,14 +106,3 @@ def configure_app(app):
     # Register cli command
     app.logger.debug('Registering cli commands ...')
     app.cli.add_command(setup_db)
-
-    # Init log folder
-    from .models.init_db_values import PROCESSING_METHODS
-    from .service.logging import setup_logger
-    from pathlib import Path
-    logging_path = Path(app.config['LOGGING_FILE_PATH'])
-    if not logging_path.is_dir():
-        logging_path.mkdir(parents=True)
-    # Set up loggers
-    for method in PROCESSING_METHODS.keys():
-        setup_logger(name=method, log_file=logging_path / f'{method}.log')

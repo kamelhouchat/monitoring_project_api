@@ -174,6 +174,7 @@ class Detector:
         for processing_method, params in self.workflow.items():
             yield PROCESSING_METHODS[processing_method](
                 dataframe=self.target_data_dataframe,
-                logger=logging.getLogger(processing_method),
+                logger=logging.getLogger(f'{self.task.id}_'
+                                         f'{processing_method}'),
                 **params
             )

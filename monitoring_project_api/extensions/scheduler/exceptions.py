@@ -14,3 +14,11 @@ class JobError(Exception):
 
     def __str__(self):
         return f'{self.message}'
+
+
+class LoggerRestoreError(JobError):
+    """Exception raised when logging path is not specified"""
+
+    def __init__(self, message="Logging path not specified exception"):
+        self.message = message
+        super(LoggerRestoreError, self).__init__(message=message)
