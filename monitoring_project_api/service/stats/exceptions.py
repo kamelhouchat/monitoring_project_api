@@ -48,3 +48,13 @@ class AverageRequestsPerTimeIntervalException(StatsException):
         self.message = message
         super(AverageRequestsPerTimeIntervalException, self).__init__(
             message=message)
+
+
+class AverageRequestsPerClientPerTimeIntervalException(StatsException):
+    """Average requests per client per time interval method exception"""
+
+    def __init__(self, message="Average requests per client per time interval "
+                               "method exception"):
+        self.message = message
+        super(AverageRequestsPerClientPerTimeIntervalException, self).__init__(
+            message=message)
