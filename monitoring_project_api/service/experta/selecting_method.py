@@ -61,3 +61,24 @@ class SelectingMethodRules:
         # Declare the fact
         self.declare(ProcessingMethod(
             method="IS_HTTP_REQUESTS_ACCEPTED_METHOD"))
+
+    ####################################
+    # Average requests per time interval
+    ####################################
+    @Rule(
+        AND(
+            NOT(ProcessingMethod(
+                method='AVERAGE_REQUESTS_PER_TIME_INTERVAL_METHOD')),
+            NotRequiredProperty(
+                property_name='average_requests_per_time_interval')
+        )
+    )
+    def select_average_requests_per_time_interval_method(self):
+        """
+        The rule allows to select the method
+        `AVERAGE_REQUESTS_PER_TIME_INTERVAL_METHOD` if the parameter
+        `average_requests_per_time_interval` is filed by the user.
+        """
+        # Declare the fact
+        self.declare(ProcessingMethod(
+            method="AVERAGE_REQUESTS_PER_TIME_INTERVAL_METHOD"))

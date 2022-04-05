@@ -38,3 +38,13 @@ class IsHTTPRequestsAcceptedException(StatsException):
     def __init__(self, message="Is http requests accepted method exception"):
         self.message = message
         super(IsHTTPRequestsAcceptedException, self).__init__(message=message)
+
+
+class AverageRequestsPerTimeIntervalException(StatsException):
+    """Average requests per time interval method exception"""
+
+    def __init__(self, message="Average requests per time interval method "
+                               "exception"):
+        self.message = message
+        super(AverageRequestsPerTimeIntervalException, self).__init__(
+            message=message)

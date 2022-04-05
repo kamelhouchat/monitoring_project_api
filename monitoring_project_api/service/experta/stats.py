@@ -87,3 +87,27 @@ class StatisticProcessingRules:
             'is_http_requests_accepted': self.not_required_properties[
                 'is_http_requests_accepted']
         })
+
+    ####################################
+    # Average requests per time interval
+    ####################################
+    @Rule(
+        AND(
+            ProcessingMethod(
+                method='AVERAGE_REQUESTS_PER_TIME_INTERVAL_METHOD'),
+            NotRequiredProperty(
+                property_name='average_requests_per_time_interval')
+        )
+    )
+    def average_requests_per_time_interval_method_update_workflow(self):
+        """
+        The rule allows to update the workflow by adding the
+        `AVERAGE_REQUESTS_PER_TIME_INTERVAL_METHOD` and its parameters.
+        """
+        # Update detector `workflow` dictionary
+        self.detector.workflow = (
+            'AVERAGE_REQUESTS_PER_TIME_INTERVAL_METHOD', {
+                'average_requests_per_time_interval':
+                    self.not_required_properties[
+                        'average_requests_per_time_interval']
+            })
