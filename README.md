@@ -64,10 +64,36 @@ flask run -p 3000
 ```
 
 > **Important**
-> 
-> The development server is not intended to be used on production systems. It 
-> was designed especially for development purposes and performs poorly under 
-> high load. For deployment setups have a look at the 
+>
+> The development server is not intended to be used on production systems. It
+> was designed especially for development purposes and performs poorly under
+> high load. For deployment setups have a look at the
 > [Application Deployment](https://werkzeug.palletsprojects.com/en/1.0.x/deployment/)
 > pages.
-> 
+
+### Operation of the service
+
+After starting the service, an ```auto_check``` is performed in order to
+execute the missed task (When the service is off), It is then performed every
+30 minutes (Can be edited in config file).
+
+To add a new ```Task```, you have to easily make an ```HTTP``` request in which
+you must specify the information relating to the ```task```, among this
+information, we have:
+
+- The data source
+- The ```task``` properties
+  - Black ip address
+  - Average requests per time interval
+  - Is http requests accepted
+  - Average requests per client per time interval
+  - Accepted urls
+  - ...
+- The ```task``` frequency
+- The next execution time
+
+After adding a ```task```, an expert system is launched to find the best
+processing method and its hyper-parameters, here is an overview of how it
+works :
+
+![process.png](./docs/process.png)
