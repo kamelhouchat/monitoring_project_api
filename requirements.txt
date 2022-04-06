@@ -5,6 +5,8 @@ SQLAlchemy~=1.4.31
 click~=8.0.4
 pytest~=7.0.1
 python-dotenv~=0.19.2
+flask-smorest~=0.37.0
+marshmallow-sqlalchemy~=0.27.0
 Flask-APScheduler==1.12.2
 APScheduler~=3.9.1
 experta~=1.9.4
