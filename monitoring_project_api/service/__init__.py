@@ -1,5 +1,5 @@
 """Anomaly detector"""
-
+import datetime
 from socket import timeout
 from typing import Any
 from typing import Dict
@@ -17,6 +17,7 @@ from .exceptions import NoProcessingMethodFoundException
 from .experta import ExpertSystem
 from .method_base import DetectionMethod
 from .opensearch import build_os_connection
+from ..extensions.database import db
 from ..models import Data
 from ..models import Task
 
@@ -113,6 +114,11 @@ class Detector:
         for processor in processors:
             processor.launch()
 
+        # Update task `last_run_time` field
+        self.task.last_run_time = datetime.datetime.now()
+        db.session.add(self.task)
+        db.session.commit()
+
     def _get_data(self) -> DataFrame:
         """
         Method which allows to retrieve the input data from the endpoint
@@ -131,12 +137,22 @@ class Detector:
         indice = target_data_args['indice']
 
         # Build query
-        query = {
-            'size': 200,
-            'query': {
-                'match_all': {}
+        if self.task.last_run_time is None:
+            query = {
+                'query': {
+                    'match_all': {}
+                }
             }
-        }
+        else:
+            query = {
+                "query": {
+                    "range": {
+                        "@timestamp": {
+                            "gte": f"{self.task.last_run_time.isoformat()}"
+                        }
+                    }
+                }
+            }
         # Make an HTTP request to get the dataframe
         try:
             response = client.search(body=query, index=indice)
