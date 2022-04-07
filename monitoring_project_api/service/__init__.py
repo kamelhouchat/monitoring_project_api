@@ -111,8 +111,9 @@ class Detector:
         # Get detector and launch it
         processors: Generator[DetectionMethod] = self._get_detectors()
 
-        for processor in processors:
-            processor.launch()
+        if len(self.target_data_dataframe):
+            for processor in processors:
+                processor.launch()
 
         # Update task `last_run_time` field
         self.task.last_run_time = datetime.datetime.now()
@@ -170,8 +171,10 @@ class Detector:
 
         # Return dataframe
         dataframe = pd.DataFrame(items)
-        dataframe['@timestamp'] = pd.to_datetime(dataframe['@timestamp'])
-        dataframe.rename(columns={'@timestamp': 'timestamp'}, inplace=True)
+        if len(dataframe):
+            dataframe['@timestamp'] = pd.to_datetime(dataframe['@timestamp'])
+            dataframe.rename(columns={'@timestamp': 'timestamp'}, inplace=True)
+
         return dataframe
 
     def _get_detectors(self) -> Generator:

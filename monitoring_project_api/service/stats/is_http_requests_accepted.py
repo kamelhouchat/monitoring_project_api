@@ -53,5 +53,11 @@ class IsHTTPRequestsAcceptedDetector(DetectionMethod):
         """
         Method used to start the processing
         """
-        pass
-        # TODO: make processing
+        if not self.is_http_requests_accepted:
+            # Detect anomalies
+            anomalies = self.dataframe[
+                self.dataframe['scheme'].str.contains('HTTP')]
+            # Log anomalies
+            if len(anomalies):
+                self.logger.warning(
+                    '\t' + anomalies.to_string().replace('\n', '\n\t'))
