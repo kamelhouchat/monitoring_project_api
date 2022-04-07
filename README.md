@@ -97,3 +97,23 @@ processing method and its hyper-parameters, here is an overview of how it
 works :
 
 ![process.png](./docs/process.png)
+
+### Docker compose
+
+```dockerfile
+# Build compose file
+docker-compose build
+# Start and Run (in detached mode: -d)
+docker-compose up -d
+# Verify running services
+docker-compose ps
+# Stop all running services
+docker-compose down
+# View logs
+docker-compose logs
+```
+
+> **Important**
+>
+> This docker container could not be used in a production mode because it's
+> only running a flask development server.
